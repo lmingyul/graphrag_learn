@@ -5,7 +5,7 @@
 
 import pandas as pd
 
-
+# [LTM源]: 处理文档和文本单元之间的关系
 def create_final_documents(
     documents: pd.DataFrame,
     text_units: pd.DataFrame,

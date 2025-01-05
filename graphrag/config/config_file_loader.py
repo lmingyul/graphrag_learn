@@ -12,6 +12,7 @@ import yaml
 from graphrag.config.create_graphrag_config import create_graphrag_config
 from graphrag.config.models.graph_rag_config import GraphRagConfig
 
+# [LTM源]: 默认支持的配置文件格式
 _default_config_files = ["settings.yaml", "settings.yml", "settings.json"]
 
 

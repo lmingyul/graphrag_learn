@@ -13,7 +13,7 @@ from graphrag.index.operations.chunk_text.chunk_text import chunk_text
 from graphrag.index.utils.hashing import gen_sha512_hash
 from graphrag.logger.progress import Progress
 
-
+# [LTM源]: 创建文本单元 TextUnits
 def create_base_text_units(
     documents: pd.DataFrame,
     callbacks: VerbCallbacks,

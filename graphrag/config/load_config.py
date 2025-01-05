@@ -32,7 +32,7 @@ def load_config(
     """
     root = root_dir.resolve()
 
-    # If user specified a config file path then it is required
+    # [LTM源]: 如果指定了配置文件，就使用指定的，否则就使用默认的
     if config_filepath:
         config_path = config_filepath.resolve()
         if not config_path.exists():

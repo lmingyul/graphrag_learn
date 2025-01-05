@@ -52,13 +52,14 @@ from graphrag.config.models.text_embedding_config import TextEmbeddingConfig
 from graphrag.config.models.umap_config import UmapConfig
 from graphrag.config.read_dotenv import read_dotenv
 
-
+# [LTM源]: 构建 GraphRAG 配置
 def create_graphrag_config(
     values: dict[str, Any] | None = None, root_dir: str | None = None
 ) -> GraphRagConfig:
     """Load Configuration Parameters from a dictionary."""
     values = values or {}
     root_dir = root_dir or str(Path.cwd())
+    # [LTM源]: 读取环境变量文件里面的值，设置到系统的环境变量里
     env = _make_env(root_dir)
     _token_replace(cast("dict", values))
 
@@ -202,12 +203,14 @@ def create_graphrag_config(
                 or base.stagger,
             )
 
+    # [LTM源]: 读取环境变量
     fallback_oai_key = env("OPENAI_API_KEY", env("AZURE_OPENAI_API_KEY", None))
     fallback_oai_org = env("OPENAI_ORG_ID", None)
     fallback_oai_base = env("OPENAI_BASE_URL", None)
     fallback_oai_version = env("OPENAI_API_VERSION", None)
 
     with reader.envvar_prefix(Section.graphrag), reader.use(values):
+        # [LTM源]: 从配置获取环境变量中读取模型的参数&配置
         async_mode = reader.str(Fragment.async_mode)
         async_mode = AsyncType(async_mode) if async_mode else defs.ASYNC_MODE
 
@@ -249,6 +252,7 @@ def create_graphrag_config(
                 if sleep_on_rate_limit is None:
                     sleep_on_rate_limit = defs.LLM_SLEEP_ON_RATE_LIMIT_RECOMMENDATION
 
+                # [LTM源]: 读取完后创建大模型的类对象
                 llm_model = LLMParameters(
                     api_key=api_key,
                     api_base=api_base,
@@ -289,6 +293,7 @@ def create_graphrag_config(
                 )
         embeddings_config = values.get("embeddings") or {}
         with reader.envvar_prefix(Section.embedding), reader.use(embeddings_config):
+            # [LTM源]: embedding 模型的配置
             embeddings_target = reader.str("target")
             # TODO: remove the type ignore annotations below once the new config engine has been refactored
             embeddings_model = TextEmbeddingConfig(
@@ -325,6 +330,7 @@ def create_graphrag_config(
                 use_lcc=use_lcc if use_lcc is not None else defs.USE_LCC,
             )
         with reader.envvar_prefix(Section.input), reader.use(values.get("input")):
+            # [LTM源]: 数据文件的读取配置
             input_type = reader.str("type")
             file_type = reader.str(Fragment.file_type)
             input_model = InputConfig(
@@ -352,6 +358,7 @@ def create_graphrag_config(
                 storage_account_blob_url=reader.str(Fragment.storage_account_blob_url),
                 container_name=reader.str(Fragment.container_name),
             )
+        # [LTM源]: 缓存配置
         with reader.envvar_prefix(Section.cache), reader.use(values.get("cache")):
             c_type = reader.str(Fragment.type)
             cache_model = CacheConfig(
@@ -362,6 +369,7 @@ def create_graphrag_config(
                 base_dir=reader.str(Fragment.base_dir) or defs.CACHE_BASE_DIR,
                 cosmosdb_account_url=reader.str(Fragment.cosmosdb_account_url),
             )
+        # [LTM源]: 社区报告相关配置
         with (
             reader.envvar_prefix(Section.reporting),
             reader.use(values.get("reporting")),
@@ -374,6 +382,7 @@ def create_graphrag_config(
                 container_name=reader.str(Fragment.container_name),
                 base_dir=reader.str(Fragment.base_dir) or defs.REPORTING_BASE_DIR,
             )
+        # [LTM源]: 存储相关的配置
         with reader.envvar_prefix(Section.storage), reader.use(values.get("storage")):
             s_type = reader.str(Fragment.type)
             storage_model = StorageConfig(
@@ -403,6 +412,8 @@ def create_graphrag_config(
                 )
             else:
                 update_index_storage_model = None
+
+        # [LTM源]: 文本切分配置
         with reader.envvar_prefix(Section.chunk), reader.use(values.get("chunks")):
             group_by_columns = reader.list("group_by_columns", "BY_COLUMNS")
             if group_by_columns is None:
@@ -434,6 +445,7 @@ def create_graphrag_config(
                 enabled=reader.bool(Fragment.enabled) or defs.UMAP_ENABLED,
             )
 
+        # [LTM源]: 实体提取配置
         entity_extraction_config = values.get("entity_extraction") or {}
         with (
             reader.envvar_prefix(Section.entity_extraction),
@@ -458,11 +470,13 @@ def create_graphrag_config(
                 entity_types=reader.list("entity_types")
                 or defs.ENTITY_EXTRACTION_ENTITY_TYPES,
                 max_gleanings=max_gleanings,
+                # [LTM源]: 提示词文件
                 prompt=reader.str("prompt", Fragment.prompt_file),
                 strategy=entity_extraction_config.get("strategy"),
                 encoding_model=encoding_model,
             )
 
+        # [LTM源]: 声明相关的配置
         claim_extraction_config = values.get("claim_extraction") or {}
         with (
             reader.envvar_prefix(Section.claim_extraction),
@@ -488,6 +502,7 @@ def create_graphrag_config(
                 encoding_model=encoding_model,
             )
 
+        # [LTM源]: 社区报告相关的配置
         community_report_config = values.get("community_reports") or {}
         with (
             reader.envvar_prefix(Section.community_reports),
@@ -506,6 +521,7 @@ def create_graphrag_config(
                 or defs.COMMUNITY_REPORT_MAX_INPUT_LENGTH,
             )
 
+        # [LTM源]: 总结相关的配置
         summarize_description_config = values.get("summarize_descriptions") or {}
         with (
             reader.envvar_prefix(Section.summarize_descriptions),
@@ -522,6 +538,7 @@ def create_graphrag_config(
                 or defs.SUMMARIZE_DESCRIPTIONS_MAX_LENGTH,
             )
 
+        # [LTM源]: 聚类的配置
         with reader.use(values.get("cluster_graph")):
             use_lcc = reader.bool("use_lcc")
             seed = reader.int("seed")
@@ -532,6 +549,7 @@ def create_graphrag_config(
                 seed=seed if seed is not None else defs.CLUSTER_GRAPH_SEED,
             )
 
+        # [LTM源]: 局部搜索配置
         with (
             reader.use(values.get("local_search")),
             reader.envvar_prefix(Section.local_search),
@@ -560,6 +578,7 @@ def create_graphrag_config(
                 or defs.LOCAL_SEARCH_LLM_MAX_TOKENS,
             )
 
+        # [LTM源]: 全局搜索的配置
         with (
             reader.use(values.get("global_search")),
             reader.envvar_prefix(Section.global_search),
@@ -655,6 +674,7 @@ def create_graphrag_config(
 
         skip_workflows = reader.list("skip_workflows") or []
 
+    # [LTM源]: 整个 RAG 的配置类
     return GraphRagConfig(
         root_dir=root_dir,
         llm=llm_model,

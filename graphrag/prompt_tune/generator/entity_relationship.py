@@ -16,7 +16,7 @@ from graphrag.prompt_tune.prompt.entity_relationship import (
 
 MAX_EXAMPLES = 5
 
-
+# [LTM源]: 生成实体&关系 prompt 的示例
 async def generate_entity_relationship_examples(
     llm: ChatLLM,
     persona: str,

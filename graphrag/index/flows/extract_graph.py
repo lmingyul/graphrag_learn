@@ -30,6 +30,7 @@ async def extract_graph(
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """All the steps to create the base entity graph."""
     # this returns a graph for each text unit, to be merged later
+    # [LTM源]: 实体提取
     entities, relationships = await extract_entities(
         text_units,
         callbacks,

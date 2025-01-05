@@ -39,6 +39,7 @@ text: {{input_text}}
 ######################
 output:"""
 
+# [LTM源]: 实体提取提示词 Prompt
 GRAPH_EXTRACTION_JSON_PROMPT = """
 -Goal-
 Given a text document that is potentially relevant to this activity and a list of entity types, identify all entities of those types from the text and all relationships among the identified entities.

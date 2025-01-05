@@ -70,6 +70,7 @@ async def build_index(
     if memory_profile:
         log.warning("New pipeline does not yet support memory profiling.")
 
+    # [LTM源]: 整个索引工作流 workflows 步骤
     workflows = _get_workflows_list(config)
 
     async for output in run_workflows(
@@ -91,7 +92,7 @@ async def build_index(
 
     return outputs
 
-
+# [LTM源]: 利用 workflow 模板创建一系列的 pipeline, 并依据依赖关系, 调整实际执行顺序, 再依次执行
 def _get_workflows_list(config: GraphRagConfig) -> list[str]:
     return [
         "create_base_text_units",

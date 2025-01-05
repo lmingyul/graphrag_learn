@@ -126,11 +126,11 @@ def update_cli(
         output_dir=output_dir,
     )
 
-
+# [LTM源]: 执行索引构建
 def _run_index(
     config,
     verbose,
-    resume,
+    resume, # [LTM源]: 添加 resume 参数，用于判断使用需要使用之前运行的结果
     memprofile,
     cache,
     logger,
@@ -168,13 +168,14 @@ def _run_index(
         f"Using default configuration: {redact(config.model_dump())}",
         verbose,
     )
-
+    # [LTM源]: 尝试运行参数，不执行构建，一般用于看参数是否合法
     if dry_run:
         info("Dry run complete, exiting...", True)
         sys.exit(0)
 
     _register_signal_handlers(progress_logger)
 
+    # [LTM源]: 异步构建索引
     outputs = asyncio.run(
         api.build_index(
             config=config,
